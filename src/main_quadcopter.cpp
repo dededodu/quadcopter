@@ -50,11 +50,13 @@ const unsigned long axis_lost_sig_pulse_lim_h = ((axis_lost_sig_pulse * 101) / 1
 #define YAW      2
 #define THROTTLE 3
 
-int imu_angle[2]; // pitch and roll angles
-int imu_angle_offset[2] = {0, 2}; // pitch and roll angle offsets
+int imu_angle[3]; // pitch, roll and heading angles
+int imu_angle_offset[2] = {-2, 2}; // pitch and roll angle offsets
 int imu_rate[3]; // pitch, roll and yaw angular velocity
 int rc_angle[3]; // pitch and roll are angles, but yaw is angular velocity
 uint16_t rc_throttle;
+bool maintain_heading = false;
+int heading = 0;
 
 const float error_sum_limit = 400;
 float angle_error[3] = {0, 0, 0};
@@ -135,6 +137,7 @@ void getImuInputs() {
     } else {
         imu_angle[PITCH] = (eulerData.p / 16) - imu_angle_offset[PITCH];
         imu_angle[ROLL] = (eulerData.r / 16) - imu_angle_offset[ROLL];
+        imu_angle[YAW] = (eulerData.h / 16);
     }
     if (bno055_read_gyro_xyz(&gyroData)) {
 #ifdef DEBUG
@@ -267,7 +270,7 @@ void getRcControls() {
     rc_throttle = rcThrottle.getPulse();
     rc_angle[PITCH] = rcPitch.mapDeadzone(0, 60, 0.01) - 30;
     rc_angle[ROLL] = rcRoll.mapDeadzone(0, 60, 0.01) - 30;
-    rc_angle[YAW] = rcYaw.mapDeadzone(0, 120, 0.01) - 60;
+    rc_angle[YAW] = rcYaw.mapDeadzone(0, 120, 0.1) - 60;
 
 #ifdef DEBUG
     unsigned long elapsed = micros() - start_us;
@@ -313,6 +316,16 @@ float minMax(float value, float min_value, float max_value) {
 }
 
 void computeErrors() {
+    if (rc_angle[YAW] == 0) {
+        if (!maintain_heading) {
+            maintain_heading = true;
+            heading = imu_angle[YAW];
+        }
+    } else {
+        maintain_heading = false;
+        heading = 0;
+    }
+
     angle_error[PITCH] = imu_angle[PITCH] - rc_angle[PITCH];
     angle_error[ROLL] = imu_angle[ROLL] - rc_angle[ROLL];
     
@@ -320,8 +333,17 @@ void computeErrors() {
     rate_error[ROLL] = (angle_error[ROLL] * 5) - imu_rate[ROLL];
     rate_error[YAW] = rc_angle[YAW] - imu_rate[YAW];
 
-    angle_error[YAW] += rate_error[YAW];
-    angle_error[YAW] = minMax(angle_error[YAW], -error_sum_limit/Ki[YAW], error_sum_limit/Ki[YAW]);
+    if (maintain_heading) {
+        angle_error[YAW] = imu_angle[YAW] - heading;
+        if (angle_error[YAW] > 180) {
+            angle_error[YAW] -= 360;
+        } else if (angle_error[YAW] < -180) {
+            angle_error[YAW] += 360;
+        }
+    } else {
+        angle_error[YAW] += rate_error[YAW];
+        angle_error[YAW] = minMax(angle_error[YAW], -error_sum_limit/Ki[YAW], error_sum_limit/Ki[YAW]);
+    }
 
     acc_error[PITCH] = rate_error[PITCH] - previous_rate_error[PITCH];
     acc_error[ROLL] = rate_error[ROLL] - previous_rate_error[ROLL];
