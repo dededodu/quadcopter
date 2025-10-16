@@ -51,7 +51,7 @@ const unsigned long axis_lost_sig_pulse_lim_h = ((axis_lost_sig_pulse * 101) / 1
 #define THROTTLE 3
 
 int imu_angle[3]; // pitch, roll and heading angles
-int imu_angle_offset[2] = {-2, 2}; // pitch and roll angle offsets
+int imu_angle_offset[2] = {-4, 0}; // pitch and roll angle offsets
 int imu_rate[3]; // pitch, roll and yaw angular velocity
 int rc_angle[3]; // pitch and roll are angles, but yaw is angular velocity
 uint16_t rc_throttle;
@@ -64,14 +64,14 @@ float rate_error[3];
 float acc_error[3];
 float previous_rate_error[3] = {0, 0, 0};
 
+/* These values worked outside
 float Kp[3] = {1.5, 1.5, 2};
 float Ki[3] = {0.5, 0.5, 0.01};
 float Kd[3] = {10, 10, 0};
-/*
-float Kp[3] = {0, 0, 3};
-float Ki[3] = {0, 0, 0.02};
-float Kd[3] = {0, 0, 0};
 */
+float Kp[3] = {1.5, 1.5, 2};
+float Ki[3] = {0.5, 0.5, 0.1};
+float Kd[3] = {5, 5, 0};
 const uint16_t throttle_threshold = 980;
 
 #define MOTOR1_PIN 5 
@@ -84,7 +84,7 @@ const uint8_t portb_mask = (uint8_t)(1 << (MOTOR4_PIN - 8)) | (uint8_t)(1 << (MO
  
 #define MOTOR_MIN_PULSE 1000
 #define MOTOR_MAX_PULSE 2000
-#define MOTOR_MIN_RUNNING_PULSE 1150
+#define MOTOR_MIN_RUNNING_PULSE 1100
 #define MAX_PULSE_CHANGE (MOTOR_MAX_PULSE - MOTOR_MIN_RUNNING_PULSE)
 
 #define MOTOR1 0
@@ -156,6 +156,9 @@ void getImuInputs() {
     Serial.print("    ");
     Serial.print("Roll angle: ");
     Serial.print(imu_angle[ROLL]);
+    Serial.print("    ");
+    Serial.print("Yaw angle: ");
+    Serial.print(imu_angle[YAW]);
     Serial.print("    ");
     Serial.print("Pitch rate: ");
     Serial.print(imu_rate[PITCH]);
