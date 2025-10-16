@@ -170,8 +170,8 @@ void getImuInputs() {
 // Expected time to go through one loop iteration (10000us)
 const unsigned long loop_period = 10000;
 
-// RC signal emergency timeout is set to 10 seconds
-const unsigned long rc_signal_timeout_us = 10000000;
+// RC signal emergency timeout is set to 3 seconds
+const unsigned long rc_signal_timeout_us = 3000000;
 const unsigned long rc_signal_emergency_trigger =
     rc_signal_timeout_us / loop_period;
 
