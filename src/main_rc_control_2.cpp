@@ -40,10 +40,10 @@ void setup() {
 
   ServoInput.attach();
 
-	while (!ServoInput.available()) {
-		Serial.println("Waiting for servo signals...");
-		delay(500);
-	}
+  while (!ServoInput.available()) {
+    Serial.println("Waiting for servo signals...");
+    delay(500);
+  }
 }
 
 void loop() {
@@ -60,24 +60,24 @@ void loop() {
   if (!yaw.available()) {
     Serial.println("Unavailable yaw");
   }
-  
+
   Serial.print("Throttle: ");
   Serial.print(throttle.getPulseRaw());
   Serial.print("    ");
   Serial.print("Pitch: ");
   Serial.print(pitch.getPulseRaw());
-  //Serial.print(pitch.mapDeadzone(0, 60, 0.01) - 30);
+  // Serial.print(pitch.mapDeadzone(0, 60, 0.01) - 30);
   Serial.print("    ");
   Serial.print("Roll: ");
   Serial.print(roll.getPulseRaw());
-  //Serial.print(roll.mapDeadzone(0, 60, 0.01) - 30);
+  // Serial.print(roll.mapDeadzone(0, 60, 0.01) - 30);
   Serial.print("    ");
   Serial.print("Yaw: ");
   Serial.print(yaw.getPulseRaw());
-  //Serial.print((yaw.mapDeadzone(0, 60, 0.01) - 30));
+  // Serial.print((yaw.mapDeadzone(0, 60, 0.01) - 30));
   Serial.print("    ");
   Serial.print("Time elapsed: ");
-  Serial.println(micros()-start);
+  Serial.println(micros() - start);
 
   delay(100);
 }
