@@ -38,17 +38,6 @@ const int YawPulseMin = 970;
 const int YawPulseMax = 1960;
 ServoInputPin<YawSignalPin> rcYaw(YawPulseMin, YawPulseMax);
 
-const unsigned long throttle_lost_sig_pulse = 1000;
-const unsigned long throttle_lost_sig_pulse_lim_l =
-    ((throttle_lost_sig_pulse * 99) / 100); // 1% margin
-const unsigned long throttle_lost_sig_pulse_lim_h =
-    ((throttle_lost_sig_pulse * 101) / 100); // 1% margin
-const unsigned long axis_lost_sig_pulse = 1500;
-const unsigned long axis_lost_sig_pulse_lim_l =
-    ((axis_lost_sig_pulse * 99) / 100); // 1% margin
-const unsigned long axis_lost_sig_pulse_lim_h =
-    ((axis_lost_sig_pulse * 101) / 100); // 1% margin
-
 #define PITCH 0
 #define ROLL 1
 #define YAW 2
@@ -108,7 +97,6 @@ void initImu() {
 }
 
 unsigned long rc_no_signal_cnt[4];
-unsigned long rc_lost_signal_cnt;
 bool emergency_mode;
 
 void initRcControls() {
@@ -124,7 +112,6 @@ void initRcControls() {
   rc_no_signal_cnt[ROLL] = 0;
   rc_no_signal_cnt[YAW] = 0;
   rc_no_signal_cnt[THROTTLE] = 0;
-  rc_lost_signal_cnt = 0;
 
   emergency_mode = false;
 }
@@ -202,8 +189,7 @@ bool rcSignalEmergency() {
   if (rc_no_signal_cnt[THROTTLE] > rc_signal_emergency_trigger ||
       rc_no_signal_cnt[PITCH] > rc_signal_emergency_trigger ||
       rc_no_signal_cnt[ROLL] > rc_signal_emergency_trigger ||
-      rc_no_signal_cnt[YAW] > rc_signal_emergency_trigger ||
-      rc_lost_signal_cnt > rc_signal_emergency_trigger) {
+      rc_no_signal_cnt[YAW] > rc_signal_emergency_trigger) {
 
     // By setting this mode, there's no going back until reset
     emergency_mode = true;
@@ -253,29 +239,6 @@ void getRcControls() {
     rc_no_signal_cnt[YAW] += 1;
   } else {
     rc_no_signal_cnt[YAW] = 0;
-  }
-
-  /**
-   * Check the value of all signals to identify a potential loss
-   * of signal.
-   */
-  unsigned long throttle_raw_pulse = rcThrottle.getPulseRaw();
-  unsigned long pitch_raw_pulse = rcPitch.getPulseRaw();
-  unsigned long roll_raw_pulse = rcRoll.getPulseRaw();
-  unsigned long yaw_raw_pulse = rcYaw.getPulseRaw();
-  if (throttle_raw_pulse > throttle_lost_sig_pulse_lim_l &&
-      throttle_raw_pulse < throttle_lost_sig_pulse_lim_h &&
-      pitch_raw_pulse > axis_lost_sig_pulse_lim_l &&
-      pitch_raw_pulse < axis_lost_sig_pulse_lim_h &&
-      roll_raw_pulse > axis_lost_sig_pulse_lim_l &&
-      roll_raw_pulse < axis_lost_sig_pulse_lim_h &&
-      yaw_raw_pulse > axis_lost_sig_pulse_lim_l &&
-      yaw_raw_pulse < axis_lost_sig_pulse_lim_h) {
-    rc_lost_signal_cnt += 1;
-  } else {
-    if (rc_lost_signal_cnt) {
-      rc_lost_signal_cnt -= 1;
-    }
   }
 
   rc_throttle = rcThrottle.getPulse();
