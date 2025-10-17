@@ -34,10 +34,10 @@ void setup() {
 
   ServoInput.attach();
 
-	while (!ServoInput.available()) {
-		Serial.println("Waiting for servo signals...");
-		delay(500);
-	}
+  while (!ServoInput.available()) {
+    Serial.println("Waiting for servo signals...");
+    delay(500);
+  }
 }
 
 void loop() {
@@ -55,7 +55,7 @@ void loop() {
   Serial.print((yaw.mapDeadzone(0, 60, 0.01) - 30));
   Serial.print("    ");
   Serial.print("Time elapsed: ");
-  Serial.println(micros()-start);
+  Serial.println(micros() - start);
 
   delay(10);
 }

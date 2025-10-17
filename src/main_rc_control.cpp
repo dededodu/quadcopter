@@ -70,7 +70,7 @@ void loop() {
   Serial.print(rcYaw);
   Serial.print("    ");
   Serial.print("Time elapsed: ");
-  Serial.println(micros()-start);
+  Serial.println(micros() - start);
 
   delay(100);
 }
