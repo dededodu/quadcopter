@@ -68,14 +68,14 @@ float rate_error[3];
 float acc_error[3];
 float previous_rate_error[3] = {0, 0, 0};
 
+/* These values worked outside
 float Kp[3] = {1.5, 1.5, 2};
 float Ki[3] = {0.5, 0.5, 0.01};
 float Kd[3] = {10, 10, 0};
-/*
-float Kp[3] = {0, 0, 3};
-float Ki[3] = {0, 0, 0.02};
-float Kd[3] = {0, 0, 0};
 */
+float Kp[3] = {1.5, 1.5, 2};
+float Ki[3] = {0.5, 0.5, 0.1};
+float Kd[3] = {5, 5, 0};
 const uint16_t throttle_threshold = 980;
 
 #define MOTOR1_PIN 5
