@@ -55,7 +55,7 @@ const unsigned long axis_lost_sig_pulse_lim_h =
 #define THROTTLE 3
 
 int imu_angle[3];                  // pitch, roll and heading angles
-int imu_angle_offset[2] = {-2, 2}; // pitch and roll angle offsets
+int imu_angle_offset[2] = {-4, 0}; // pitch and roll angle offsets
 int imu_rate[3];                   // pitch, roll and yaw angular velocity
 int rc_angle[3]; // pitch and roll are angles, but yaw is angular velocity
 uint16_t rc_throttle;
