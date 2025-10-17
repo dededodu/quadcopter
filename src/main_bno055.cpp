@@ -7,6 +7,7 @@
 // (Updated after initialization)
 struct bno055_t myBNO;
 struct bno055_euler myEulerData; // Structure to hold the Euler data
+struct bno055_linear_accel myLinearAccelData;
 
 unsigned long lastTime = 0;
 
@@ -31,7 +32,6 @@ void loop() {
   unsigned long start = micros();
 
   bno055_read_euler_hrp(&myEulerData);
-
   Serial.print("Heading(Yaw): ");
   Serial.print(float(myEulerData.h) / 16.00);
   Serial.print("    ");
@@ -40,6 +40,21 @@ void loop() {
   Serial.print("    ");
   Serial.print("Pitch: ");
   Serial.print(float(myEulerData.p) / 16.00);
+  Serial.print("    ");
+  Serial.print("Elapsed time: ");
+  Serial.println(micros() - start);
+
+  start = micros();
+
+  bno055_read_linear_accel_xyz(&myLinearAccelData);
+  Serial.print("LinearAccel X: ");
+  Serial.print(myLinearAccelData.x);
+  Serial.print("    ");
+  Serial.print("LinearAccel Y: ");
+  Serial.print(myLinearAccelData.y);
+  Serial.print("    ");
+  Serial.print("LinearAccel Z: ");
+  Serial.print(myLinearAccelData.z);
   Serial.print("    ");
   Serial.print("Elapsed time: ");
   Serial.println(micros() - start);
