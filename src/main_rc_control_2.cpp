@@ -29,6 +29,12 @@ const int YawPulseMin = 970;
 const int YawPulseMax = 1960;
 ServoInputPin<YawSignalPin> yaw(YawPulseMin, YawPulseMax);
 
+/**
+ * When RC receiver doesn't get the signal from the emitter (lost signal or
+ * dead battery), here are the expected values on all channels:
+ * Throttle: 1000    Pitch: 1500    Roll: 1500    Yaw: 1500 (+/-1%)
+ */
+
 void setup() {
   Serial.begin(115200);
 
@@ -42,20 +48,36 @@ void setup() {
 
 void loop() {
   unsigned long start = micros();
+  if (!throttle.available()) {
+    Serial.println("Unavailable throttle");
+  }
+  if (!pitch.available()) {
+    Serial.println("Unavailable pitch");
+  }
+  if (!roll.available()) {
+    Serial.println("Unavailable roll");
+  }
+  if (!yaw.available()) {
+    Serial.println("Unavailable yaw");
+  }
+
   Serial.print("Throttle: ");
-  Serial.print(throttle.getPercent() * 100);
+  Serial.print(throttle.getPulseRaw());
   Serial.print("    ");
   Serial.print("Pitch: ");
-  Serial.print(pitch.mapDeadzone(0, 60, 0.01) - 30);
+  Serial.print(pitch.getPulseRaw());
+  // Serial.print(pitch.mapDeadzone(0, 60, 0.01) - 30);
   Serial.print("    ");
   Serial.print("Roll: ");
-  Serial.print(roll.mapDeadzone(0, 60, 0.01) - 30);
+  Serial.print(roll.getPulseRaw());
+  // Serial.print(roll.mapDeadzone(0, 60, 0.01) - 30);
   Serial.print("    ");
   Serial.print("Yaw: ");
-  Serial.print((yaw.mapDeadzone(0, 60, 0.01) - 30));
+  Serial.print(yaw.getPulseRaw());
+  // Serial.print((yaw.mapDeadzone(0, 60, 0.01) - 30));
   Serial.print("    ");
   Serial.print("Time elapsed: ");
   Serial.println(micros() - start);
 
-  delay(10);
+  delay(100);
 }
