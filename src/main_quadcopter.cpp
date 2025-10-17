@@ -43,6 +43,8 @@ ServoInputPin<YawSignalPin> rcYaw(YawPulseMin, YawPulseMax);
 #define YAW 2
 #define THROTTLE 3
 
+#define THROTTLE_MIN_VALID_PULSE 1020
+
 int imu_angle[3];                  // pitch, roll and heading angles
 int imu_angle_offset[2] = {-4, 0}; // pitch and roll angle offsets
 int imu_rate[3];                   // pitch, roll and yaw angular velocity
@@ -65,7 +67,6 @@ float Kd[3] = {10, 10, 0};
 float Kp[3] = {1.5, 1.5, 2};
 float Ki[3] = {0.5, 0.5, 0.1};
 float Kd[3] = {5, 5, 0};
-const uint16_t throttle_threshold = 980;
 
 #define MOTOR1_PIN 5
 #define MOTOR2_PIN 6
@@ -386,12 +387,12 @@ void computeOutputs() {
 
   // No need to compute the new outputs if the RC controller didn't give the
   // signal to run.
-  if (rc_throttle < throttle_threshold) {
+  if (rc_throttle < THROTTLE_MIN_VALID_PULSE) {
     angle_error[PITCH] = angle_error[ROLL] = angle_error[YAW] = 0;
     previous_rate_error[PITCH] = previous_rate_error[ROLL] =
         previous_rate_error[YAW] = 0;
     motor_pulse[MOTOR1] = motor_pulse[MOTOR2] = motor_pulse[MOTOR3] =
-        motor_pulse[MOTOR4] = rc_throttle;
+        motor_pulse[MOTOR4] = MOTOR_MIN_PULSE;
   } else {
     pitch_pid = minMax((angle_error[PITCH] * Ki[PITCH]) +
                            (rate_error[PITCH] * Kp[PITCH]) +
